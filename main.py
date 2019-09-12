@@ -5,6 +5,7 @@ import httplib2
 from googleapiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
 
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('service_account_file', type=str, help='Service Account file in json format')
@@ -14,14 +15,14 @@ def main():
                         help='Track to upload the apk to')
     args = parser.parse_args()
 
-    SERVICE_ACCOUNT_FILE = args.service_account_file
-    PACKAGE_NAME = args.package_name
-    APP_BUNDLE_FILE = args.aab_file
-    TRACK = args.track
+    service_account_file = args.service_account_file
+    package_name = args.package_name
+    app_bundle_file = args.aab_file
+    track = args.track
 
     # Load credentials
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
-        SERVICE_ACCOUNT_FILE, scopes='https://www.googleapis.com/auth/androidpublisher')
+        service_account_file, scopes='https://www.googleapis.com/auth/androidpublisher')
     http = httplib2.Http()
     http = credentials.authorize(http)
 
@@ -30,32 +31,33 @@ def main():
 
     edit_id = None
     try:
-        edit_request = service.edits().insert(body={}, packageName=PACKAGE_NAME)
+        edit_request = service.edits().insert(body={}, packageName=package_name)
         result = edit_request.execute()
         edit_id = result['id']
 
         aab_response = service.edits().bundles().upload(
             editId=edit_id,
-            packageName=PACKAGE_NAME,
+            packageName=package_name,
             media_mime_type='application/octet-stream',
-            media_body=APP_BUNDLE_FILE).execute()
+            media_body=app_bundle_file).execute()
         print('Android App Bundle with {} version code has been uploaded'.format(aab_response['versionCode']))
 
         track_response = service.edits().tracks().update(
             editId=edit_id,
-            track=TRACK,
-            packageName=PACKAGE_NAME,
+            track=track,
+            packageName=package_name,
             body={'versionCodes': [aab_response['versionCode']]}).execute()
-        print('Track {} is set for version code(s) {}'.format(TRACK, track_response['versionCodes']))
+        print('Track {} is set for version code(s) {}'.format(track, track_response['versionCodes']))
 
         commit_request = service.edits().commit(
-            editId=edit_id, packageName=PACKAGE_NAME).execute()
+            editId=edit_id, packageName=package_name).execute()
 
         print('Edit #{} has been committed'.format(commit_request['id']))
     except Exception as e:
-        delete_edit_response = service.edits().delete(
-            editId=edit_id, packageName=PACKAGE_NAME).execute()
+        service.edits().delete(
+            editId=edit_id, packageName=package_name).execute()
         print(e)
+
 
 if __name__ == '__main__':
     main()
