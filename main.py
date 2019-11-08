@@ -27,7 +27,7 @@ def main():
     http = credentials.authorize(http)
 
     # Create the service
-    service = build('androidpublisher', 'v2', http)
+    service = build('androidpublisher', 'v3', http)
 
     edit_id = None
     try:
