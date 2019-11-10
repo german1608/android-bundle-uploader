@@ -47,13 +47,12 @@ def main():
             track=track,
             packageName=package_name,
             body={
-                'track': track,
                 'releases': [{
                     'versionCodes': [aab_response['versionCode']],
                     'status': 'completed'
                 }]
             }).execute()
-        print('Track {} is set for version code(s) {}'.format(track, track_response['versionCodes']))
+        print('Track {} is set for version code(s) {}'.format(track, track_response['releases']))
 
         commit_request = service.edits().commit(
             editId=edit_id, packageName=package_name).execute()
