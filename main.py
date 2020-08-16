@@ -13,12 +13,27 @@ def main():
     parser.add_argument('aab_file', type=str, help='Path of the Android App Bundle file')
     parser.add_argument('track', choices=['production', 'alpha', 'beta', 'internal'], default='internal',
                         help='Track to upload the apk to')
+    parser.add_argument(
+        '--release-notes', '-n',
+        type=str,
+        nargs=2,
+        action='append',
+        default=[],
+        help='''
+            User-facing notes for the release in the specified language,
+            e.g. "--release-notes en-US 'Bug fixes and performance improvements.'".
+            Can be specified multiple times for multiple languages.
+            For language codes see https://support.google.com/googleplay/android-developer/table/4419860
+        ''',
+        metavar=('LANGUAGE', 'TEXT')
+    )
     args = parser.parse_args()
 
     service_account_file = args.service_account_file
     package_name = args.package_name
     app_bundle_file = args.aab_file
     track = args.track
+    release_notes = list(map(lambda pair: {"language": pair[0], "text": pair[1]}, args.release_notes))
 
     # Load credentials
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
@@ -49,7 +64,8 @@ def main():
             body={
                 'releases': [{
                     'versionCodes': [aab_response['versionCode']],
-                    'status': 'completed'
+                    'status': 'completed',
+                    'releaseNotes': release_notes,
                 }]
             }).execute()
         print('Track {} is set for version code(s) {}'.format(track, track_response['releases']))
