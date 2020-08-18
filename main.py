@@ -33,7 +33,7 @@ def main():
     package_name = args.package_name
     app_bundle_file = args.aab_file
     track = args.track
-    release_notes = list(map(lambda pair: {"language": pair[0], "text": pair[1]}, args.release_notes))
+    release_notes = list(map(lambda note: {"language": note[0], "text": note[1]}, args.release_notes))
 
     # Load credentials
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
