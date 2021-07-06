@@ -4,8 +4,8 @@ Small and simple python script that uploads an Android App Bundle to the Google 
 
 ## Usage
 
-1. Install the requirements using pip `pip install -r requirements.txt`
-2. Run `python main.py` to execute the script and get usage info
+1. Install the package using pip `pip install -e .`
+2. Run `android-bundle-uploader` to execute the script and get usage info
 
 ## How to contribute
 
